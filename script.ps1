@@ -81,6 +81,7 @@ try {
         }
         else {
             Write-Host "Not able to create a snapshot of C Drive for $vm" -ForegroundColor Red
+            Write-Host "Skipping to the next VM." -ForegroundColor Yellow
         }
     }
 }
@@ -88,8 +89,41 @@ catch {
     <#Do this if a terminating exception happens#>
 }
 
+#Create the new disk
+try {
+    foreach ($vm in $affectedVMs) {
 
+        $snapName = $vm + "-c-snap"
+        $snapID = Get-AzSnapshot -Name $snapName
 
+        if ($snapID) {
+            $diskDetail = Get-AzDisk | Where-Object {$_.Name -match $vm}
+
+            $diskConfigDetails = @{
+                SkuName = $diskDetail.Sku.Name
+                Location = $diskDetail.Location
+                CreateOption = "Copy"
+                SourceResourceID = $snapID.Id
+                DiskSizeGB = $diskDetail.DiskSizeGB
+            }
+
+            $diskConfig = New-AzDiskConfig $diskConfigDetails -Verbose
+
+            $diskName = $diskDetail.Name + "fixed"
+            New-AzDisk -Disk $diskConfig -ResourceGroupName $diskDetail.ResourceGroupName -DiskName $diskName -Verbose
+
+            Write-Host "New Disk has been created - $diskName"
+        }
+        else {
+            Write-Host "Disk snapshot named $snapName does not exist."
+        }
+        
+
+    }
+}
+catch {
+    
+}
 
 #Attached to the new diagnostics VM as a data disk
 
