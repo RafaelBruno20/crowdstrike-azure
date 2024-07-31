@@ -25,15 +25,15 @@ try {
             $vmStatus = Get-AzVm -Name $vmTrue.Name -Status
 
             if ($vmStatus.Statuses[1].Code -match "running") {
-                Write-Host "${$vmTrue.Name} is running. Turning it off now..." -ForegroundColor Yellow
+                Write-Host "$($vmTrue.Name) is running. Turning it off now..." -ForegroundColor Yellow
 
                 Stop-AzVM -Name $vmTrue.Name -ResourceGroupName $vmTrue.ResourceGroupName
                 Start-Sleep 30
 
-                Write-Host "${$vmTrue.Name} is now shutting down!" -ForegroundColor Green
+                Write-Host "$($vmTrue.Name) is now shutting down!" -ForegroundColor Green
             }
             else {
-                Write-Host "${$vmTrue.Name} is already off."
+                Write-Host "$($vmTrue.Name) is already off."
             }
         }
     }
@@ -76,7 +76,7 @@ try {
                 Write-Host "Snapshot $snapName was not created..." -ForegroundColor Red
             }
 
-            Write-Host "Snapshot ${$snapConfirm.Name} was create sucessufully!" -ForegroundColor Green
+            Write-Host "Snapshot $($snapConfirm.Name) was create sucessufully!" -ForegroundColor Green
             
         }
         else {
